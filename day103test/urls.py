@@ -15,7 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-
+from stark.service import cxadmin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^stark/', cxadmin.cxsite.urls),
 ]

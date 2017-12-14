@@ -6,4 +6,3 @@ class StarkConfig(AppConfig):
     def ready(self):
         from django.utils.module_loading import autodiscover_modules
         autodiscover_modules('stark')
-        # self.module.autodiscover('stark')
