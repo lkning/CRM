@@ -1,12 +1,51 @@
 from django.shortcuts import render,HttpResponse
 class StarkConfig(object):
+    list_display=[]
     def __init__(self,model,cxadmin_site):
         self.model = model
         self.cxadmin_site = cxadmin_site
 
     def changelist_view(self,request,*args,**kwargs):
-        # if self
-        return HttpResponse("列表")
+        """
+                /stark/app01/userinfo/    self.model_class=models.UserInfo
+        		/stark/app01/role/        self.model_class=models.Role
+                :param request:
+                :param args:
+                :param kwargs:
+                :return:
+                """
+        # 处理表头
+
+        head_list = []
+        for field_name in self.list_display:
+            if isinstance(field_name, str):
+                # 根据类和字段名称，获取字段对象的verbose_name
+                verbose_name = self.model._meta.get_field(field_name).verbose_name
+            else:
+                verbose_name = field_name(self,is_header=True)
+            head_list.append(verbose_name)
+
+        # 处理表中的数据
+        # [ UserInfoObj,UserInfoObj,UserInfoObj,UserInfoObj,]
+        # [ UserInfo(id=1,name='alex',age=18),UserInfo(id=2,name='alex2',age=181),]
+        data_list = self.model.objects.all()
+        new_data_list = []
+        for row in data_list:
+            # row是 UserInfo(id=2,name='alex2',age=181)
+            # row.id,row.name,row.age
+            temp = []
+            for field_name in self.list_display:
+                if isinstance(field_name, str):
+                    val = getattr(row, field_name)  # # 2 alex2
+                else:
+                    val = field_name(self, row)
+                temp.append(val)
+            new_data_list.append(temp)
+
+        return render(request,'stark/changelist.html', {'data_list': new_data_list, 'head_list': head_list})
+
+
+
     def add_view(self,request,*args,**kwargs):
         return HttpResponse("添加页面")
     def history_view(self,request,*args,**kwargs):
